@@ -1,0 +1,160 @@
+version: "3"
+
+services:
+  proxy:
+    image: traefik:v2.2
+    container_name: proxy
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    links:
+      - maildev
+    volumes:
+      - //var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.toml:/etc/traefik/traefik.toml:ro
+      - ./cert:/cert/
+      - ./logs/:/logs/
+      - ./traefik/config/:/config/
+    networks:
+      - webgateway
+
+  maildev:
+    image: maildev/maildev
+    container_name: maildev
+    ports:
+      - "1080:80"
+      - "1025:25"
+    labels:
+      - "traefik.docker.network=webgateway"
+      - "traefik.http.routers.maildev.rule=Host(`maildev.localhost`)"
+      - "traefik.http.routers.maildev.entrypoints=web"
+    networks:
+      - webgateway
+
+  mysql56:
+    image: mysql:5.6.40
+    container_name: mysql56
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_USER: 'root'
+    volumes:
+      - dir_mysql56:/var/lib/mysql
+    networks:
+      - webgateway
+
+  mysql57:
+    image: mysql:5.7.32
+    container_name: mysql57
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_USER: 'root'
+      MYSQL_MODES: "ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+    volumes:
+      - dir_mysql57:/var/lib/mysql
+    networks:
+      - webgateway
+
+  php56:
+    build: php56
+    container_name: php56
+    ports:
+      - "9056:80"
+    links:
+      - mysql56
+      - proxy
+    volumes:
+      - ./vhosts:/etc/apache2/sites-enabled
+      - dir_web:/var/www
+      - ./cert:/var/lib/apache2/cert/
+      - ./logs:/var/log/apache2/
+      - ./logs:/var/www/log/
+    labels:
+      - "traefik.docker.network=webgateway"
+    networks:
+      - webgateway
+
+  php71:
+    build: php71
+    container_name: php71
+    ports:
+      - "9071:80"
+    links:
+      - mysql57
+      - proxy
+    volumes:
+      - ./vhosts:/etc/apache2/sites-enabled
+      - dir_web:/var/www
+      - ./cert:/var/lib/apache2/cert/
+      - ./logs:/var/log/apache2/
+      - ./logs:/var/www/log/
+    labels:
+      - "traefik.docker.network=webgateway"
+    networks:
+      - webgateway
+
+  php72:
+    build: php72
+    container_name: php72
+    ports:
+      - "9072:80"
+    links:
+      - mysql57
+      - proxy
+    volumes:
+      - ./vhosts:/etc/apache2/sites-enabled
+      - dir_web:/var/www
+      - ./cert:/var/lib/apache2/cert/
+      - ./logs:/var/log/apache2/
+      - ./logs:/var/www/log/
+    labels:
+      - "traefik.docker.network=webgateway"
+    networks:
+      - webgateway
+
+  php73:
+    build: php73
+    container_name: php73
+    ports:
+      - "9073:80"
+    links:
+      - mysql57
+      - proxy
+    volumes:
+      - ./vhosts:/etc/apache2/sites-enabled
+      - dir_web:/var/www
+      - ./cert:/var/lib/apache2/cert/
+      - ./logs:/var/log/apache2/
+      - ./logs:/var/www/log/
+    labels:
+      - "traefik.docker.network=webgateway"
+    networks:
+      - webgateway
+
+volumes:
+  dir_web:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${DIR_WEB}'
+  dir_mysql56:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${DIR_MYSQL}\\mysql56'
+  dir_mysql57:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${DIR_MYSQL}\\mysql57'
+
+networks:
+  webgateway:
+    driver: bridge

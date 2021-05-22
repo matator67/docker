@@ -1,0 +1,38 @@
+# /apps/traefik/traefik.toml
+
+[api]
+dashboard = true
+insecure = true
+
+# Docker configuration backend
+# [docker]
+#   domain = "docker.localhost"
+
+# Writing Logs to a File, in JSON
+[log]
+level = "INFO"
+filePath = "/logs/traefik-file.log"
+format = "json"
+
+# Configuring a buffer of 100 lines
+[accessLog]
+filePath = "/logs/traefik-access.log"
+bufferingSize = 100
+
+[providers]
+docker = true
+    [providers.file]
+    directory = "/config/"
+    # watch = true
+
+[entryPoints.web]
+  address = ":80"
+#  [entryPoints.http.redirect]
+#    regex = "^http://localhost/(.*)"
+#    replacement = "http://mydomain/$1"
+#  [entryPoints.web.http.redirections.entryPoint]
+#    to = "websecure"
+#    scheme = "https"
+
+[entryPoints.websecure]
+  address = ":443"
