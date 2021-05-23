@@ -6,11 +6,12 @@ insecure = true
 
 # Docker configuration backend
 # [docker]
-#   domain = "docker.localhost"
+# domain = "docker.localhost"
 
 # Writing Logs to a File, in JSON
 [log]
 level = "INFO"
+# level = "DEBUG"
 filePath = "/logs/traefik-file.log"
 format = "json"
 
@@ -27,9 +28,6 @@ docker = true
 
 [entryPoints.web]
   address = ":80"
-#  [entryPoints.http.redirect]
-#    regex = "^http://localhost/(.*)"
-#    replacement = "http://mydomain/$1"
 #  [entryPoints.web.http.redirections.entryPoint]
 #    to = "websecure"
 #    scheme = "https"

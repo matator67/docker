@@ -15,7 +15,7 @@ services:
       - ./traefik/traefik.toml:/etc/traefik/traefik.toml:ro
       - ./cert:/cert/
       - ./logs/:/logs/
-      - ./traefik/config/:/config/
+      - ./traefik/config/:/config/:ro
     networks:
       - webgateway
 
@@ -132,6 +132,8 @@ services:
       - ./logs:/var/www/log/
     labels:
       - "traefik.docker.network=webgateway"
+      - "traefik.http.routers.site-masseur-kinesitherapeute-bilgerlefevre.rule=Host(`local.masseur-kinesitherapeute-bilgerlefevre.fr`)"
+      - "traefik.http.routers.site-masseur-kinesitherapeute-bilgerlefevre.entrypoints=web"
     networks:
       - webgateway
 

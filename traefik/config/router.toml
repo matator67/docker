@@ -1,0 +1,12 @@
+# router.toml
+
+[http.routers]
+  [http.routers.site-symfony]
+    entryPoints = ["web"]
+    rule = "Host(`local.mathieu-fournial.fr`)"
+    service = "symfony-service"
+
+[http.services]
+  [http.services.symfony-service.loadBalancer]
+    [[http.services.symfony-service.loadBalancer.servers]]
+      url = "http://192.168.1.14:8000"

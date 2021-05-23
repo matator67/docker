@@ -33,18 +33,27 @@ Ajouter les DNS mappé sur le reverse-proxy Traefik, pour cela il est possible d
       - "traefik.http.routers.mysite-https.tls=true"
 ```
 
-Plus d'info sur la documentation officiel : <https://doc.traefik.io/traefik/v1.7/configuration/backends/docker/>
+Plus d'info sur la documentation officielle : <https://doc.traefik.io/traefik/v1.7/configuration/backends/docker/>
 
 #### Routing en dehors des conteneurs
 
-Editer le fichier de config `./traefik/traefik.toml`, puis ajouter l'entypoint suivant (selon vos besoins) :
+Créer un fichier de configuration `./traefik/config/router.config`, puis inscrire le paramètrage suivant (identique à celui du dessus) :
 
 ```
-[entryPoints.web]
-  [entryPoints.http.redirect]
-    regex = "^http://local.my-site.com/(.*)"
-    replacement = "http://localhost:8000/$1"
+# router.toml
+
+[http.routers]
+  [http.routers.mysite]
+    rule = "Host(`local.my-site.com`)"
+    service = "my-site-service"
+
+[http.services]
+  [http.services.my-site-service.loadBalancer]
+    [[http.services.my-site-service.loadBalancer.servers]]
+      url = "http://<private-ip-server-1>:<private-port-server-1>/"
 ```
+
+Plus d'info sur la documentation officielle : <https://doc.traefik.io/traefik/routing/routers/>, <https://doc.traefik.io/traefik/routing/services/>
 
 ### Certificats SSL
 
