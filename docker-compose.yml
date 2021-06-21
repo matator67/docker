@@ -8,6 +8,7 @@ services:
       - "80:80"
       - "8080:8080"
       - "443:443"
+      - "3306:3306"
     links:
       - maildev
     volumes:
@@ -36,12 +37,16 @@ services:
     image: mysql:5.6.40
     container_name: mysql56
     ports:
-      - "3307:3306"
+      - "3356:3306"
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_USER: 'root'
     volumes:
       - dir_mysql56:/var/lib/mysql
+    labels:
+      - "traefik.docker.network=webgateway"
+      - "traefik.http.routers.mysql56.rule=Host(`mysql56`)"
+      - "traefik.http.routers.mysql56.entrypoints=mysql"
     networks:
       - webgateway
 
@@ -49,13 +54,17 @@ services:
     image: mysql:5.7.32
     container_name: mysql57
     ports:
-      - "3306:3306"
+      - "3357:3306"
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_USER: 'root'
       MYSQL_MODES: "ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
     volumes:
       - dir_mysql57:/var/lib/mysql
+    labels:
+      - "traefik.docker.network=webgateway"
+      - "traefik.http.routers.mysql57.rule=Host(`mysql57`)"
+      - "traefik.http.routers.mysql57.entrypoints=mysql"
     networks:
       - webgateway
 
@@ -134,6 +143,12 @@ services:
       - "traefik.docker.network=webgateway"
       - "traefik.http.routers.site-masseur-kinesitherapeute-bilgerlefevre.rule=Host(`local.masseur-kinesitherapeute-bilgerlefevre.fr`)"
       - "traefik.http.routers.site-masseur-kinesitherapeute-bilgerlefevre.entrypoints=web"
+      - "traefik.http.routers.site-gite-le-jardin-emma.rule=Host(`local.gite-le-jardin-emma.fr`)"
+      - "traefik.http.routers.site-gite-le-jardin-emma.entrypoints=web"
+      - "traefik.http.routers.site-a2p-deco.rule=Host(`local.a2p-deco.fr`)"
+      - "traefik.http.routers.site-a2p-deco.entrypoints=web"
+      - "traefik.http.routers.site-fournial-dev.rule=Host(`local.fournial.dev`)"
+      - "traefik.http.routers.site-fournial-dev.entrypoints=web"
     networks:
       - webgateway
 

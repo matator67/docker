@@ -34,3 +34,6 @@ docker = true
 
 [entryPoints.websecure]
   address = ":443"
+
+[entryPoints.mysql]
+  address = ":3306"

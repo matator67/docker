@@ -7,3 +7,13 @@
 # [[tls.certificates]]
 #   certFile = "/cert/_.mysite.com.crt"
 #   keyFile = "/cert/_.mysite.com.key"
+
+[tls.stores]
+  [tls.stores.default]
+    [tls.stores.default.defaultCertificate]
+      certFile = "/cert/_.fournial.dev.crt"
+      keyFile = "/cert/_.fournial.dev.key"
+
+[[tls.certificates]]
+  certFile = "/cert/_.fournial.dev.crt"
+  keyFile = "/cert/_.fournial.dev.key"
