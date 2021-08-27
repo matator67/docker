@@ -23,6 +23,7 @@ services:
   maildev:
     image: maildev/maildev
     container_name: maildev
+    command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
     ports:
       - "1080:80"
       - "1025:25"
@@ -32,6 +33,19 @@ services:
       - "traefik.http.routers.maildev.entrypoints=web"
     networks:
       - webgateway
+
+  phpmyadmin:
+    image: phpmyadmin:5.1.1-apache
+    container_name: phpmyadmin
+    depends_on:
+        - mysql57
+    ports:
+      - 8888:80
+    environment:
+        PMA_HOST: mysql57
+        PMA_ABSOLUTE_URI: http://localhost:8888/
+    networks:
+        - webgateway
 
   mysql56:
     image: mysql:5.6.40
@@ -149,6 +163,8 @@ services:
       - "traefik.http.routers.site-a2p-deco.entrypoints=web"
       - "traefik.http.routers.site-fournial-dev.rule=Host(`local.fournial.dev`)"
       - "traefik.http.routers.site-fournial-dev.entrypoints=web"
+      - "traefik.http.routers.site-mathieu-fournial-fr.rule=Host(`local.mathieu-fournial.fr`)"
+      - "traefik.http.routers.site-mathieu-fournial-fr.entrypoints=web"
     networks:
       - webgateway
 
