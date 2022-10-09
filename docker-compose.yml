@@ -38,11 +38,11 @@ services:
     image: phpmyadmin:5.1.1-apache
     container_name: phpmyadmin
     depends_on:
-        - mysql57
+        - mysql80
     ports:
       - 8888:80
     environment:
-        PMA_HOST: mysql57
+        PMA_HOST: mysql80
         PMA_ABSOLUTE_URI: http://localhost:8888/
     networks:
         - webgateway
@@ -79,6 +79,23 @@ services:
       - "traefik.docker.network=webgateway"
       - "traefik.http.routers.mysql57.rule=Host(`mysql57`)"
       - "traefik.http.routers.mysql57.entrypoints=mysql"
+    networks:
+      - webgateway
+
+  mysql80:
+    platform: linux/x86_64
+    image: mysql:8.0.26
+    container_name: mysql80
+    ports:
+      - 3380:3306
+      - 33060:33060
+    environment:
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      MYSQL_MODES: "ONLY_FULL_GROUP_BY,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - dir_mysql80:/var/lib/mysql
     networks:
       - webgateway
 
@@ -168,7 +185,32 @@ services:
     networks:
       - webgateway
 
+  ubuntu:
+    platform: linux/x86_64
+    build:
+      context: ubuntu
+      args:
+        GIT_USERNAME: '${GIT_USERNAME}'
+        GIT_PASSWORD: '${GIT_PASSWORD}'
+    container_name: ubuntu
+    ports:
+      - 80:80
+    links:
+      - mysql80
+      - maildev
+    volumes:
+      - www_data:/var/www
+      - dir_web:/var/www2
+      - ./vhosts:/etc/apache2/sites-enabled
+      - ./www:/var/www/html
+      - ./cert:/var/lib/apache2/cert/
+      - ./logs:/var/log/apache2/
+    networks:
+      - webgateway
+
 volumes:
+  www_data:
+    driver: local
   dir_web:
     driver: local
     driver_opts:
@@ -187,6 +229,12 @@ volumes:
       type: 'none'
       o: 'bind'
       device: '${DIR_MYSQL}\\mysql57'
+  dir_mysql80:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${DIR_MYSQL}\\mysql80'
 
 networks:
   webgateway:
