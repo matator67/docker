@@ -57,7 +57,7 @@ RUN a2enmod proxy_fcgi setenvif
 RUN a2enconf php7.4-fpm
 
 # Installation du client Symfony
-RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash
 RUN apt install symfony-cli
 
 # Setup Composer
