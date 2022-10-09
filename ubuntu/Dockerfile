@@ -57,9 +57,8 @@ RUN a2enmod proxy_fcgi setenvif
 RUN a2enconf php7.4-fpm
 
 # Installation du client Symfony
-RUN wget https://get.symfony.com/cli/installer -O - | bash
-RUN ls ${HOME}/.symfony5/bin/
-RUN mv ${HOME}/.symfony5/bin/symfony /usr/local/bin/symfony
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash
+RUN apt install symfony-cli
 
 # Setup Composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
